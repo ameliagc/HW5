@@ -37,10 +37,10 @@ import twitter_info
 ## **** If you choose not to do that, we strongly advise using authentication information for an 'extra' Twitter account you make just for this class, and not your personal account, because it's not ideal to share your authentication information for a real account that you use frequently.
 
 ## Get your secret values to authenticate to Twitter. You may replace each of these with variables rather than filling in the empty strings if you choose to do the secure way for 50 EC points
-consumer_key = "" 
-consumer_secret = ""
-access_token = ""
-access_token_secret = ""
+consumer_key = twitter_info.consumer_key
+consumer_secret = twitter_info.consumer_secret
+access_token = twitter_info.access_token
+access_token_secret = twitter_info.access_token_secret
 ## Set up your authentication to Twitter
 auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
@@ -54,7 +54,6 @@ api = tweepy.API(auth, parser=tweepy.parsers.JSONParser()) # Set up library to g
 ## 3. Invoke your function, save the return value in a variable, and explore the data you got back!
 ## 4. With what you learn from the data -- e.g. how exactly to find the text of each tweet in the big nested structure -- write code to print out content from 3 tweets, as shown above.
 
-# start out cache
 CACHE_FNAME = "cached_data_socialmedia.json"
 try:
 	cache_file = open(CACHE_FNAME,'r')
@@ -63,31 +62,30 @@ try:
 except:
 	CACHE_DICTION = {}
 
-# Then you've got to do stuff in the function!
 def get_tweets_from_user(username):
-	unique_identifier = "twitter_{}".format(username) # seestring formatting chapter
-	# see if that username+twitter is in the cache diction!
-	if unique_identifier in CACHE_DICTION: # if it is...
+	unique_identifier = "twitter_{}".format(username) 
+
+	if unique_identifier in CACHE_DICTION:
 		print('using cached data for', username)
-		twitter_results = CACHE_DICTION[unique_identifier] # grab the data from the cache!
+		twitter_results = CACHE_DICTION[unique_identifier]
 	else:
 		print('getting data from internet for', username)
-		twitter_results = api.user_timeline(username) # get it from the internet
-		# but also, save in the dictionary to cache it!
-		CACHE_DICTION[unique_identifier] = twitter_results # add it to the dictionary -- new key-val pair
-		# and then write the whole cache dictionary, now with new info added, to the file, so it'll be there even after your program closes!
-		f = open(CACHE_FNAME,'w') # open the cache file for writing
-		f.write(json.dumps(CACHE_DICTION)) # make the whole dictionary holding data and unique identifiers into a json-formatted string, and write that wholllle string to a file so you'll have it next time!
+		twitter_results = api.user_timeline(username)
+
+		CACHE_DICTION[unique_identifier] = twitter_results
+		
+		f = open(CACHE_FNAME,'w')
+		f.write(json.dumps(CACHE_DICTION)) 
 		f.close()
 
-	# now no matter what, you have what you need in the twitter_results variable still, go back to what we were doing!
-	tweet_texts = [] # collect 'em all!
+	
+	tweet_texts = [] 
 	for tweet in twitter_results:
 		tweet_texts.append(tweet["text"])
 	return tweet_texts[:3]
 
 
-three_tweets = get_tweets_from_user("umich") # try with your own username, too! or other umich usernames!
+three_tweets = get_tweets_from_user("ameliacacchione") 
 for t in three_tweets:
 	print("TWEET TEXT:", t)
 	print("\n")
